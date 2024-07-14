@@ -1,32 +1,25 @@
-// average2 вычисляет среднее значение
+// count подсчитывает количество вхождений
+// каждой строки в файле.
 
 package main
 
 import (
 	"fmt"
 	"log"
-	"os"
-	"strconv"
+
+	"github.com/ty1oz/datafile"
 )
 
-func average(numbers ...float64) float64 {
-	var sum float64 = 0
-	for _, number := range numbers {
-		sum += number
-	}
-	return sum / float64(len(numbers))
-}
-
 func main() {
-	arguments := os.Args[1:]
-	var numbers []float64                  // В этом сегменте будут храниться числа, для которых вычисляется среднее
-	for _, arargument := range arguments { // обрабатываем каждый элемент командной строки
-		number, err := strconv.ParseFloat(arargument, 64) // строка преобразуется в float64
-		if err != nil {                                   // если при преобразовании строки произошла ошибка, программа выводит сообщение и завершается
-			log.Fatal(err)
-		}
-		numbers = append(numbers, number)
-
+	lines, err := datafile.GetStrings("votes.txt")
+	if err != nil {
+		log.Fatal(err)
 	}
-	fmt.Printf("Average: %0.2f\n", average(numbers...)) // вычесление среднего значения и его вывод
+	counts := make(map[string]int) // объявляем карту, у которой ключами являются имена кандидатов, а значениями - счетчики голосов
+	for _, line := range lines {
+		counts[line]++ // увеличивает счетчик голосов для текущего кандидата
+	}
+	for name, count := range counts {
+		fmt.Printf("Votes for %s: %d\n", name, count) // вывод ключа(имя кандидата) и значения (количество голосов)
+	}
 }
