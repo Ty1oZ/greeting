@@ -11,27 +11,15 @@ import (
 )
 
 func main() {
-	lines, err := datafile.GetStrings("votes.txt") // Читает файл «votes.txt» и возвращает сегмент содержащий все строки из файла
+	lines, err := datafile.GetStrings("votes.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	var names []string // переменная для хранения сегмента с именами кандидатов
-	var counts []int   // сегмент с количеством вхождения каждого имени
+	counts := make(map[string]int) // объявляем карту, у которой ключами являются имена кандидатов, а значениями - счетчики голосов
 	for _, line := range lines {
-		matched := false
-		for i, name := range names { // перебор всех значений из сегмента names
-			if name == line { // если эта строка совпадает с текщим именем
-				counts[i]++    // увеличивем соответсвующий счетчик
-				matched = true // устанавливает признак обнаружения совпадения
-			}
-		}
-		if matched == false { // если совпадений не найдено
-			names = append(names, line) // добавить его как новое имя
-			counts = append(counts, 1)  // добавить новый счетчик(текущая строка станет первым вхождением)
-		}
+		counts[line]++ // увеличивает счетчик голосов для текущего кандидата
 	}
-	for i, name := range names {
-		fmt.Printf("%s: %d\n", name, counts[i]) // вывести каждый элемент из сегмента names и соответсующий элемент из сегмента counts
+	for name, count := range counts {
+		fmt.Printf("Votes for %s: %d\n", name, count) // вывод ключа(имя кандидата) и значения (количество голосов)
 	}
 }
