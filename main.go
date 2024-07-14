@@ -1,32 +1,37 @@
-// average2 вычисляет среднее значение
+// count подсчитывает количество вхождений
+// каждой строки в файле.
 
 package main
 
 import (
 	"fmt"
 	"log"
-	"os"
-	"strconv"
+
+	"github.com/ty1oz/datafile"
 )
 
-func average(numbers ...float64) float64 {
-	var sum float64 = 0
-	for _, number := range numbers {
-		sum += number
-	}
-	return sum / float64(len(numbers))
-}
-
 func main() {
-	arguments := os.Args[1:]
-	var numbers []float64                  // В этом сегменте будут храниться числа, для которых вычисляется среднее
-	for _, arargument := range arguments { // обрабатываем каждый элемент командной строки
-		number, err := strconv.ParseFloat(arargument, 64) // строка преобразуется в float64
-		if err != nil {                                   // если при преобразовании строки произошла ошибка, программа выводит сообщение и завершается
-			log.Fatal(err)
-		}
-		numbers = append(numbers, number)
-
+	lines, err := datafile.GetStrings("votes.txt") // Читает файл «votes.txt» и возвращает сегмент содержащий все строки из файла
+	if err != nil {
+		log.Fatal(err)
 	}
-	fmt.Printf("Average: %0.2f\n", average(numbers...)) // вычесление среднего значения и его вывод
+
+	var names []string // переменная для хранения сегмента с именами кандидатов
+	var counts []int   // сегмент с количеством вхождения каждого имени
+	for _, line := range lines {
+		matched := false
+		for i, name := range names { // перебор всех значений из сегмента names
+			if name == line { // если эта строка совпадает с текщим именем
+				counts[i]++    // увеличивем соответсвующий счетчик
+				matched = true // устанавливает признак обнаружения совпадения
+			}
+		}
+		if matched == false { // если совпадений не найдено
+			names = append(names, line) // добавить его как новое имя
+			counts = append(counts, 1)  // добавить новый счетчик(текущая строка станет первым вхождением)
+		}
+	}
+	for i, name := range names {
+		fmt.Printf("%s: %d\n", name, counts[i]) // вывести каждый элемент из сегмента names и соответсующий элемент из сегмента counts
+	}
 }
